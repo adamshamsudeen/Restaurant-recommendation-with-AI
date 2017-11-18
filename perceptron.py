@@ -76,15 +76,18 @@ def test_accuracy(w):
 			#print "tdata",training_data[i][fLen]
 			#print  "wdata",w[fLen]
 			score+=dot_product(test_data1[i][fLen], w[fLen])
-		#print"score",score
+
+		# print"score",score
 		if(score >= 0):
 				print "Recommend Restaurant ",i+1
 				count+=1
 		
-
+print len(training_data)
 
 for i in range(len(training_data1)):
 	features=training_data1[i]
+	# print(i)
+	print features
 	#weights=w[0]
 	#print len(w),w[0],w[1],w[2]
 	score=0
@@ -92,9 +95,10 @@ for i in range(len(training_data1)):
 	neww=[]
 	
 	for fLen in iter:
-		#print "tdata",training_data[i][fLen]
-		#print  "wdata",w[fLen]
+		print "tdata",training_data[i][fLen]
+		print  "wdata",w[fLen]
 		score+=dot_product(training_data1[i][fLen], w[fLen])
+	print score
 	# if(score >= 0):
 				# label="like"
 	# else:
