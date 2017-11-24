@@ -1,47 +1,23 @@
-#  Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-"""Example of DNNClassifier for Iris plant dataset.
-
-This example uses APIs in Tensorflow 1.4 or above.
-"""
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import os
-import urllib
+
 
 import tensorflow as tf
-import numpy as np
+
 # Data sets
-IRIS_TRAINING = 'iris_training.csv'
-IRIS_TRAINING_URL = 'http://download.tensorflow.org/data/iris_training.csv'
+IRIS_TRAINING = 'track_train.csv'
+IRIS_TRAINING_URL = ''
 
-IRIS_TEST = 'iris_test.csv'
-IRIS_TEST_URL = 'http://download.tensorflow.org/data/iris_test.csv'
+IRIS_TEST = 'track_test.csv'
+IRIS_TEST_URL = ''
 
-FEATURE_KEYS = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+FEATURE_KEYS = ['os','browser','device_type', 'page_visits', 'unique_visits', 'time_Spent']
 
 
 def maybe_download_iris_data(file_name, download_url):
-  """Downloads the file and returns the number of data."""
-  if not os.path.exists(file_name):
-    raw = urllib.urlopen(download_url).read()
-    with open(file_name, 'w') as f:
-      f.write(raw)
-
   # The first line is a comma-separated string. The first one is the number of
   # total data in the file.
   with open(file_name, 'r') as f:
@@ -101,34 +77,18 @@ def main(unused_argv):
   feature_columns = [
       tf.feature_column.numeric_column(key, shape=1) for key in FEATURE_KEYS]
   classifier = tf.estimator.DNNClassifier(
-      feature_columns=feature_columns, hidden_units=[10, 20, 10], n_classes=3)
+      feature_columns=feature_columns, hidden_units=[10, 20, 10], n_classes=3,model_dir='./checkpoint')
 
   # Train.
-  train_input_fn = input_fn(IRIS_TRAINING, num_training_data, batch_size=32,
+  train_input_fn = input_fn(IRIS_TRAINING, num_training_data, batch_size=100,
                             is_training=True)
-  classifier.train(input_fn=train_input_fn, steps=400)
+  classifier.train(input_fn=train_input_fn, steps=1000)
 
   # Eval.
-  test_input_fn = input_fn(IRIS_TEST, num_test_data, batch_size=32,
+  test_input_fn = input_fn(IRIS_TEST, num_test_data, batch_size=100,
                            is_training=False)
   scores = classifier.evaluate(input_fn=test_input_fn)
   print('Accuracy (tensorflow): {0:f}'.format(scores['accuracy']))
-
-
-  new_samples = np.array(
-      [[6.4, 3.2, 4.5, 1.5],
-       [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
-  predict_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": new_samples},
-      num_epochs=1,
-      shuffle=False)
-
-  predictions = list(classifier.predict(input_fn=predict_input_fn))
-  predicted_classes = [p["classes"] for p in predictions]
-
-  print(
-      "New Samples, Class Predictions:    {}\n"
-      .format(predicted_classes))
 
 
 if __name__ == '__main__':
