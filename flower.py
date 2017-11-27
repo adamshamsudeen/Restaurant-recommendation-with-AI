@@ -53,7 +53,7 @@ def main():
       shuffle=True)
 
   # Train model.
-  classifier.train(input_fn=train_input_fn, steps=2000)
+  # classifier.train(input_fn=train_input_fn, steps=2000)
 
   # Define the test inputs
   test_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -63,33 +63,54 @@ def main():
       shuffle=False)
 
   # Evaluate accuracy.
-  accuracy_score = classifier.evaluate(input_fn=test_input_fn)["accuracy"]
+  # accuracy_score = classifier.evaluate(input_fn=test_input_fn)["accuracy"]
 
-  print("\nTest Accuracy: {0:f}\n".format(accuracy_score))
+  # print("\nTest Accuracy: {0:f}\n".format(accuracy_score))
 
   # Classify two new flower samples.
   new_samples = np.array(
       [[6.4, 3.2, 4.5, 1.5],
-       [5.8, 3.1, 5.0, 1.7]], dtype=np.float32)
+       [5.8, 3.1, 5.0, 1.7],
+       [4.3, 3.0, 1.1, 0.1],
+       [5.6, 2.8, 4.9, 2.0],
+       [5.5, 2.3, 4.0, 1.3]], dtype=np.float32)
   predict_input_fn = tf.estimator.inputs.numpy_input_fn(
       x={"x": new_samples},
       num_epochs=1,
       shuffle=False)
 
   predictions = list(classifier.predict(input_fn=predict_input_fn))
-  print(predictions)
+  # print(predictions)
+
   predicted_classes = [p["classes"] for p in predictions]
 
   predicted_prob = [p["probabilities"] for p in predictions]
+  # print(predicted_classes)
+  for c in predicted_classes:
+    print(c)
+  print("\n")
+  for p in predicted_prob:
+    print(p[0]*100, "Probablity for setosa")
 
-  print(
-      "New Samples, Class Predictions:    {}\n"
-      .format(predicted_classes))
-  print(
-      "New Samples, Class Predictions:    {}\n"
-      .format(predicted_prob))
-  predictions = list(classifier.predicted_classes(input_fn=predict_input_fn))
-  print(predictions)  
+    print(p[1]*100, "Probablity for versivolor")
+    print(p[2]*100, "Probablity for verginica")  
+    print("\n")
+    # print(p)
+    # for a in p:
+    #   print(a*100)
+  # print(list(predicted_prob[0]))
+  # predicted_prob = dir(predicted_prob)
+
+  # print(predicted_prob)
+  # print(
+  #     "New Samples, Class Predictions:    {}\n"
+  #     .format(predicted_classes))
+  # print(
+  #     "New Samples, Class Predictions:    {}\n"
+  #     .format(predicted_prob))
+  print(classifier.latest_checkpoint())
+  # predictions = list(classifier.predict_proba(input_fn=predict_input_fn))
+  # print(predictions)  
   
 if __name__ == "__main__":
     main()
